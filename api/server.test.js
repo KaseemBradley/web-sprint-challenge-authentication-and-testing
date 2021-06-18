@@ -63,5 +63,11 @@ describe("server", () => {
       res = await request(server).post("/api/auth/login").send(kaseem);
       expect(res.body.message).toMatch(/welcome,/i);
     });
+    it("creates token", async () => {
+      let res;
+      await db("users").insert(kaseemInsert);
+      res = await request(server).post("/api/auth/login").send(kaseem);
+      expect(res.body).toHaveProperty("token");
+    });
   });
 });
