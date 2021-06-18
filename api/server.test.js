@@ -75,6 +75,22 @@ describe("server", () => {
       let res;
       res = await request(server).post("/api/auth/register").send({});
       expect(res.body.message).toMatch(/username and password required/i);
+
+      res = await request(server)
+        .post("/api/auth/register")
+        .send({ username: "kaseem" });
+      expect(res.body.message).toMatch(/username and password required/i);
+
+      res = await request(server)
+        .post("/api/auth/register")
+        .send({ password: "1234" });
+      expect(res.body.message).toMatch(/username and password required/i);
+    });
+    it("adds user on successful register", async () => {
+      let res;
+      await request(server).post("/api/auth/register").send(kaseem);
+      res = await db("users");
+      expect(res).toHaveLength(1);
     });
   });
 });
