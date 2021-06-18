@@ -70,4 +70,11 @@ describe("server", () => {
       expect(res.body).toHaveProperty("token");
     });
   });
+  describe("registering", () => {
+    it("rejects on missing credentials", async () => {
+      let res;
+      res = await request(server).post("/api/auth/register").send({});
+      expect(res.body.message).toMatch(/username and password required/i);
+    });
+  });
 });
