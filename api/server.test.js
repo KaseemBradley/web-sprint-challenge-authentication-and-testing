@@ -52,5 +52,10 @@ describe("server", () => {
         .send({ password: "1234" });
       expect(res.body.message).toMatch(/username and password required/i);
     });
+    it("fails to login if user is missing", async () => {
+      let res;
+      res = await request(server).post("/api/auth/login").send(kaseem);
+      expect(res.body.message).toMatch(/invalid credentials/i);
+    });
   });
 });
