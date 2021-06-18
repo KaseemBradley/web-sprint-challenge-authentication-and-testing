@@ -52,8 +52,30 @@ router.post("/register", async (req, res) => {
   */
 });
 
-router.post("/login", (req, res) => {
-  res.end("implement login, please!");
+router.post("/login", async (req, res) => {
+  if (!req.body.username || !req.body.password) {
+    return res.status(401).json({ message: "username and password required" });
+  }
+
+  const exists = await db("users")
+    .where({ username: req.body.username })
+    .then((data) => {
+      return data[0];
+    });
+
+  if (
+    !exists ||
+    exists.length === 0 ||
+    !bcrypt.compareSync(req.body.password, exists.password)
+  ) {
+    return res.status(401).json({ message: "invalid credentials" });
+  }
+
+  const token = makeToken(exists);
+  res.status(200).json({
+    message: `welcome, ${exists.username}`,
+    token: token,
+  });
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -78,5 +100,16 @@ router.post("/login", (req, res) => {
       the response body should include a string exactly as follows: "invalid credentials".
   */
 });
+
+function makeToken(user) {
+  const payload = {
+    subject: user.id,
+    username: user.username,
+  };
+  const options = {
+    expiresIn: "1d",
+  };
+  return jwt.sign(payload, JWT_SECRET, options);
+}
 
 module.exports = router;
