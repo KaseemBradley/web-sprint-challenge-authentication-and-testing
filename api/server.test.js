@@ -57,5 +57,11 @@ describe("server", () => {
       res = await request(server).post("/api/auth/login").send(kaseem);
       expect(res.body.message).toMatch(/invalid credentials/i);
     });
+    it("login success with proper credentials", async () => {
+      let res;
+      await db("users").insert(kaseemInsert);
+      res = await request(server).post("/api/auth/login").send(kaseem);
+      expect(res.body.message).toMatch(/welcome,/i);
+    });
   });
 });
